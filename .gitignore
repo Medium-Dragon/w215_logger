@@ -127,3 +127,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# python envo
+pyvenv.cfg
+Scripts/
+Lib/
+Include/
+.vscode/
+
+switches.cfg
+influxdb.cfg
