@@ -23,7 +23,7 @@ async def get_current_consumption(switch: configparser,
         t = int(math.floor(statistics.mean([t1, t2])))
         await q.put((str(switch['mac']), str(sp.current_consumption), int(t)))
         if int(math.ceil(time.time())) < (t + 60):
-            t = 60 - (t1 % 60)
+            t = 60 - (t % 60)
             await asyncio.sleep(t)
             print(switch['mac'] + " sleeping for " + str(t))
     return
