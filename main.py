@@ -17,23 +17,27 @@ import statistics
 async def get_current_consumption(switch: configparser,
                                   q: asyncio.Queue) -> None:
     while True:
-        t1 = time.time()
-        sp = SmartPlug(switch['ip'], switch['pin'], use_legacy_protocol=True)
-        t2 = time.time()
-        t = int(math.floor(statistics.mean([t1, t2])))
-        await q.put((str(switch['mac']), str(sp.current_consumption), int(t)))
-        if int(math.ceil(time.time())) < (t + 60):
-            t = 60 - (t % 60)
-            await asyncio.sleep(t)
-            print(switch['mac'] + " sleeping for " + str(t))
+        start_time = time.time()
+        smart_plug = SmartPlug(switch['ip'],
+                               switch['pin'],
+                               use_legacy_protocol=True)
+        end_time = time.time()
+        measurement_time = int(
+            math.floor(statistics.mean([start_time, end_time])))
+        await q.put((str(switch['mac']), str(smart_plug.current_consumption),
+                     int(measurement_time)))
+        if int(math.ceil(time.time())) < (measurement_time + 60):
+            sleep_time = 60 - (measurement_time % 60)
+            await asyncio.sleep(sleep_time)
+            print(switch['mac'] + " sleeping for " + str(sleep_time))
     return
 
 
 async def log_to_influxdb(q: asyncio.Queue) -> None:
     while True:
         await asyncio.sleep(random.choice([17, 19, 23]))
-        mac, current_consumption, t = await q.get()
-        print(str(mac) + " " + str(current_consumption) + " " + str(t))
+        mac, current_consumption, measurement_time = await q.get()
+        print(str(mac) + " " + str(current_consumption) + " " + str(measurement_time))
     return
 
 
